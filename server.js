@@ -23,21 +23,27 @@ app.get("/api/hello", function(req, res) {
   res.json({ greeting: "hello API" });
 });
 
-app.get("/api/timestamp/:date_string?", function(req, res) {
-  let s = req.params.date_string || 0;
+app.get("/api/timestamp", function(req, res) {
   let dt;
   let unix;
   let utc;
 
-  if (s.length >= 10 ){
+  dt = new Date();
+  unix = dt.getTime();
+  utc = dt.toUTCString();
+  res.json({ unix: unix, utc: utc });
+});
+
+app.get("/api/timestamp/:date_string", function(req, res) {
+  let s = req.params.date_string;
+  let dt;
+  let unix;
+  let utc;
+
+  if (s.length == 13) {
     s = parseInt(s);
     dt = new Date(s);
 
-    unix = dt.getTime();
-    utc = dt.toUTCString();
-    
-  } else if (s == 0) {
-    dt = new Date();
     unix = dt.getTime();
     utc = dt.toUTCString();
   } else {
@@ -46,7 +52,12 @@ app.get("/api/timestamp/:date_string?", function(req, res) {
     unix = dt.getTime();
     utc = dt.toUTCString();
   }
-  res.json({"unix":unix,  "utc":utc});
+   if (dt.toString() === "Invalid Date") {
+    res.json({ error: "Invaid Date" });
+   }else{
+     res.json({ unix: unix, utc: utc });
+   }
+  
 });
 
 // listen for requests :)
